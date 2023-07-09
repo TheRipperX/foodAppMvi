@@ -6,4 +6,10 @@
     </style>
 
     <style name="Theme.FoodAppMvi" parent="Base.Theme.FoodAppMvi" />
+
+    <style name="TopRoundedImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">10dp</item>
+        <item name="cornerSizeTopRight">10dp</item>
+    </style>
 </resources>

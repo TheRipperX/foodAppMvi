@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/LightCyan"
+    tools:context=".ui.home.HomeFragment">
+
+    <!--    top layout -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/con_lay_images"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.flaviofaria.kenburnsview.KenBurnsView
+            android:id="@+id/img_rand_"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription,ImageContrastCheck"
+            tools:src="@drawable/loading" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.3"
+            android:background="@color/cyan"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--    layout search and slider-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_search_slider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/con_lay_images"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/con_lay_images">
+        <!--    spinner-->
+        <Spinner
+            android:id="@+id/spinner_home"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginVertical="5dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/shape_bg_circel"
+            android:dropDownVerticalOffset="5dp"
+            android:elevation="3dp"
+            android:overlapAnchor="false"
+            android:paddingHorizontal="10dp"
+            android:popupBackground="@drawable/shape_bg_circel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints,SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+        <!--edit text search-->
+        <EditText
+            android:id="@+id/edt_search"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="30dp"
+            android:background="@drawable/shape_bg_circel"
+            android:drawableStart="@drawable/baseline_search_24"
+            android:elevation="5dp"
+            android:hint="@string/search"
+            android:maxLines="1"
+            android:padding="6dp"
+            android:paddingStart="10dp"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/spinner_home"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="Autofill,RtlSymmetry,TextFields,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--    layout bottom category and food list-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_category_and_foodList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_search_slider"
+        tools:ignore="MissingConstraints">
+
+        <!--        layout category food-->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_category"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <!--            recycler view category list-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rec_category_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingHorizontal="25dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <!--            progressbar  category list food-->
+            <ProgressBar
+                android:id="@+id/progressbar_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!--        layout food list-->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_food_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_category">
+
+            <TextView
+                android:id="@+id/food_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="@string/food_list"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="VisualLintOverlap" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rec_food_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:clipToPadding="false"
+                android:paddingHorizontal="25dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/food_txt" />
+
+            <ProgressBar
+                android:id="@+id/progress_food_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/food_txt" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_empty_internet"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/layout_search_slider"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent">
+
+        <include
+            android:id="@+id/included_layout"
+            layout="@layout/empty_or_internet_layout"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
