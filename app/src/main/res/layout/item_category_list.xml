@@ -4,9 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_margin="3dp"
-    android:padding="1dp"
+    android:paddingHorizontal="5dp"
     android:elevation="3dp"
-    android:background="@drawable/items_bg_sh_category"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -15,7 +14,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:src="@drawable/empty"
         android:layout_margin="3dp"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -26,7 +24,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="3dp"
-        android:hint="@string/category_items"
         android:textColor="@color/black"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@id/img_category_items"

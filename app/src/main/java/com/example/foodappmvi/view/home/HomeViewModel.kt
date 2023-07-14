@@ -1,5 +1,6 @@
 package com.example.foodappmvi.view.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodappmvi.data.repository.HomeRepository
@@ -27,16 +28,35 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
             when(it){
                 is HomeIntent.SetSpinnerIntent -> { fetchSpinnerList() }
                 is HomeIntent.SetRandomIntent -> { fetchRandomImage() }
+                is HomeIntent.SetCategoryIntent -> { fetchCategory() }
             }
         }
     }
 
-    private suspend fun fetchSpinnerList() {
+    private fun fetchCategory() = viewModelScope.launch {
+        val category = homeRepository.reqCategory()
+
+        _state.emit(HomeState.SetLoadingCategory)
+        when(category.code()) {
+            in 200..202 -> {
+                if (category.isSuccessful){
+                    category.body()?.let {
+                        _state.emit(HomeState.SetCategoryState(it.categories.toMutableList()))
+                    }
+
+                }else { _state.emit(HomeState.Error("no success\nplease check internet...")) }
+            }
+            in 400..499 -> { _state.emit(HomeState.Error("not fund\nplease try again...")) }
+            in 500..599 -> { _state.emit(HomeState.Error("server error\nthe connect server is error please try again...")) }
+        }
+    }
+
+    private fun fetchSpinnerList()  = viewModelScope.launch {
         val spinnerItems = listOf('A'..'Z').flatten().toMutableList()
         _state.emit(HomeState.SetSpinnerState(spinnerItems))
     }
 
-    private suspend fun fetchRandomImage() {
+    private fun fetchRandomImage()  = viewModelScope.launch {
         val random = homeRepository.reqRandom()
         when(random.code()) {
             in 200..202 -> {
@@ -45,17 +65,10 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
                         _state.emit(HomeState.SetRandomState(it.meals[0]))
                     }
 
-                }else {
-                    _state.emit(HomeState.Error("no success\nplease check internet..."))
-                }
-
+                }else { _state.emit(HomeState.Error("no success\nplease check internet...")) }
             }
-            in 400..499 -> {
-                _state.emit(HomeState.Error("not fund\nplease try again..."))
-            }
-            in 500..599 -> {
-                _state.emit(HomeState.Error("server error\nthe connect server is error please try again..."))
-            }
+            in 400..499 -> { _state.emit(HomeState.Error("not fund\nplease try again...")) }
+            in 500..599 -> { _state.emit(HomeState.Error("server error\nthe connect server is error please try again...")) }
         }
     }
 }

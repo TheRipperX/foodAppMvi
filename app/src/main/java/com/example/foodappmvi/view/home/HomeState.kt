@@ -1,10 +1,16 @@
 package com.example.foodappmvi.view.home
 
+import com.example.foodappmvi.data.model.server.ResponseCategory
 import com.example.foodappmvi.data.model.server.ResponseRandom
 
 sealed class HomeState {
     object Idle: HomeState()
-    data class SetSpinnerState(val list: MutableList<*>): HomeState()
+    //set item to spinner
+    data class SetSpinnerState(val list: MutableList<Char>): HomeState()
+    //set item to image random
     data class SetRandomState(val img: ResponseRandom.Meal?): HomeState()
+    //set item to category adapter
+    data class SetCategoryState(val list: MutableList<ResponseCategory.Category>): HomeState()
+    object SetLoadingCategory: HomeState()
     data class Error(val error: String): HomeState()
 }
