@@ -167,6 +167,20 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/food_txt" />
 
+            <ImageView
+                android:id="@+id/img_no_data"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:clipToPadding="false"
+                android:src="@drawable/notfound"
+                android:visibility="gone"
+                android:paddingHorizontal="25dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/food_txt"
+                tools:ignore="ContentDescription" />
+
             <ProgressBar
                 android:id="@+id/progress_food_list"
                 android:layout_width="wrap_content"

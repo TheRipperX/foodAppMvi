@@ -29,8 +29,32 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
                 is HomeIntent.SetSpinnerIntent -> { fetchSpinnerList() }
                 is HomeIntent.SetRandomIntent -> { fetchRandomImage() }
                 is HomeIntent.SetCategoryIntent -> { fetchCategory() }
+                is HomeIntent.SetFoodListIntent -> { fetchFoodList(it.food) }
             }
         }
+    }
+
+    private fun fetchFoodList(food: String) = viewModelScope.launch{
+        val request = homeRepository.reqFoodList(food)
+
+        _state.emit(HomeState.SetLoadingFoodList)
+        when(request.code()) {
+
+            in 200..202 -> {
+
+                request.body()?.let {
+
+                    if (!it.meals.isNullOrEmpty())
+                        _state.emit(HomeState.SetFoodListState(it.meals.toMutableList()))
+                    else
+                        _state.emit(HomeState.Empty)
+
+                }
+            }
+            in 400..499 -> { _state.emit(HomeState.Error("not fund\nplease try again...")) }
+            in 500..599 -> { _state.emit(HomeState.Error("server error\nthe connect server is error please try again...")) }
+        }
+
     }
 
     private fun fetchCategory() = viewModelScope.launch {
@@ -44,7 +68,7 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
                         _state.emit(HomeState.SetCategoryState(it.categories.toMutableList()))
                     }
 
-                }else { _state.emit(HomeState.Error("no success\nplease check internet...")) }
+                }else { _state.emit(HomeState.Error("unsuccessful\nno data is show...")) }
             }
             in 400..499 -> { _state.emit(HomeState.Error("not fund\nplease try again...")) }
             in 500..599 -> { _state.emit(HomeState.Error("server error\nthe connect server is error please try again...")) }

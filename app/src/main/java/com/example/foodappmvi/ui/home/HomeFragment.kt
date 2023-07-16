@@ -13,6 +13,7 @@ import coil.load
 import com.example.foodappmvi.R
 import com.example.foodappmvi.databinding.FragmentHomeBinding
 import com.example.foodappmvi.ui.home.adapter.AdapterCategory
+import com.example.foodappmvi.ui.home.adapter.AdapterFoodList
 import com.example.foodappmvi.utils.isSetAction
 import com.example.foodappmvi.utils.isVisibleView
 import com.example.foodappmvi.utils.setItemSpinner
@@ -38,6 +39,8 @@ class HomeFragment : Fragment() {
     //inject
     @Inject
     lateinit var categoryAdapter: AdapterCategory
+    @Inject
+    lateinit var adapterFoodList: AdapterFoodList
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,9 +69,8 @@ class HomeFragment : Fragment() {
                     when(it) {
                         is HomeState.Idle -> {}
                         is HomeState.SetSpinnerState -> {
-                            Log.d("TAG", "main: ${it.list}")
                             spinnerHome.setItemSpinner(it.list) {str->
-
+                                lifecycleScope.launch { homeViewModel.homeChannel.send(HomeIntent.SetFoodListIntent(str)) }
                             }
                         }
                         is HomeState.SetRandomState -> {
@@ -81,6 +83,7 @@ class HomeFragment : Fragment() {
                         }
                         is HomeState.Error -> {
                             progressbarCategory.isVisibleView(false, recCategoryList)
+                            progressFoodList.isVisibleView(false, recFoodList)
                             Snackbar.make(binding.root, it.error, Snackbar.LENGTH_LONG).show()
                         }
                         is HomeState.SetCategoryState -> {
@@ -90,9 +93,32 @@ class HomeFragment : Fragment() {
                             categoryAdapter.setDataAdapter(data)
                             recCategoryList.isSetAction(categoryAdapter, LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false))
 
+                            categoryAdapter.clickItems {
+
+                            }
                         }
                         is HomeState.SetLoadingCategory -> {
                             progressbarCategory.isVisibleView(true, recCategoryList)
+                        }
+                        is HomeState.SetLoadingFoodList -> {
+                            progressFoodList.isVisibleView(true, recFoodList)
+                        }
+                        is HomeState.SetFoodListState -> {
+                            progressFoodList.isVisibleView(false, recFoodList)
+                            imgNoData.isVisibleView(false, recFoodList)
+                            val foodList = it.foodList
+
+                            adapterFoodList.setDataAdapter(foodList)
+
+                            recFoodList.isSetAction(adapterFoodList, LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false))
+
+                            adapterFoodList.clickItems {
+
+                            }
+                        }
+                        is HomeState.Empty -> {
+                            progressFoodList.isVisibleView(false, recFoodList)
+                            imgNoData.isVisibleView(true, recFoodList)
                         }
                     }
                 }
