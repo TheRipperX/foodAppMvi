@@ -9,7 +9,11 @@
         android:id="@+id/detailFragment"
         android:name="com.example.foodappmvi.ui.detail.DetailFragment"
         android:label="fragment_detail"
-        tools:layout="@layout/fragment_detail" />
+        tools:layout="@layout/fragment_detail" >
+        <argument
+            android:name="idFood"
+            app:argType="integer" />
+    </fragment>
     <fragment
         android:id="@+id/favoriteFragment"
         android:name="com.example.foodappmvi.ui.favorite.FavoriteFragment"
@@ -19,5 +23,12 @@
         android:id="@+id/homeFragment"
         android:name="com.example.foodappmvi.ui.home.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+
+    </fragment>
+
+    <action
+        android:id="@+id/action_to_detailFragment"
+        app:destination="@id/detailFragment" />
+
 </navigation>

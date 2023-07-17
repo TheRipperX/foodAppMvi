@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.example.foodappmvi.databinding.FragmentHomeBinding
@@ -76,6 +77,11 @@ class HomeFragment : Fragment() {
                                     crossfade(true)
                                     crossfade(500)
                                 }
+                                imgRand.setOnClickListener {_->
+                                    val idImage = it.img.idMeal.toInt()
+                                    val directions = HomeFragmentDirections.actionToDetailFragment(idImage)
+                                    findNavController().navigate(directions)
+                                }
                             }
                         }
                         is HomeState.Error -> {
@@ -113,8 +119,10 @@ class HomeFragment : Fragment() {
 
                             recFoodList.isSetAction(adapterFoodList, LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false))
 
-                            adapterFoodList.clickItems {
-
+                            adapterFoodList.clickItems {data->
+                                val id = data.idMeal.toInt()
+                                val directions = HomeFragmentDirections.actionToDetailFragment(id)
+                                findNavController().navigate(directions)
                             }
                         }
                         is HomeState.Empty -> {
