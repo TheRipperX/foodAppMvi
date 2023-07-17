@@ -1,16 +1,15 @@
 package com.example.foodappmvi.ui.home
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
-import com.example.foodappmvi.R
 import com.example.foodappmvi.databinding.FragmentHomeBinding
 import com.example.foodappmvi.ui.home.adapter.AdapterCategory
 import com.example.foodappmvi.ui.home.adapter.AdapterFoodList
@@ -22,8 +21,6 @@ import com.example.foodappmvi.view.home.HomeState
 import com.example.foodappmvi.view.home.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -121,6 +118,12 @@ class HomeFragment : Fragment() {
                             imgNoData.isVisibleView(true, recFoodList)
                         }
                     }
+                }
+            }
+
+            edtSearch.addTextChangedListener {
+                lifecycleScope.launch {
+                    homeViewModel.homeChannel.send(HomeIntent.SetSearchFoodIntent(it.toString()))
                 }
             }
 

@@ -5,4 +5,5 @@ sealed class HomeIntent {
     object SetRandomIntent: HomeIntent()
     object SetCategoryIntent: HomeIntent()
     data class SetFoodListIntent(val food: String): HomeIntent()
+    data class SetSearchFoodIntent(val search: String): HomeIntent()
 }
