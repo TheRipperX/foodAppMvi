@@ -1,6 +1,5 @@
 package com.example.foodappmvi.view.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodappmvi.data.repository.HomeRepository
@@ -31,7 +30,30 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
                 is HomeIntent.SetCategoryIntent -> { fetchCategory() }
                 is HomeIntent.SetFoodListIntent -> { fetchFoodList(it.food) }
                 is HomeIntent.SetSearchFoodIntent -> { fetchSearchFood(it.search) }
+                is HomeIntent.SetCategoryList -> { fetchCategoryList(it.category) }
             }
+        }
+    }
+
+    private fun fetchCategoryList(category: String) = viewModelScope.launch {
+        val request = homeRepository.reqCategoryList(category)
+
+        _state.emit(HomeState.SetLoadingFoodList)
+        when(request.code()) {
+
+            in 200..202 -> {
+
+                request.body()?.let {
+
+                    if (!it.meals.isNullOrEmpty())
+                        _state.emit(HomeState.SetFoodListState(it.meals.toMutableList()))
+                    else
+                        _state.emit(HomeState.Empty)
+
+                }
+            }
+            in 400..499 -> { _state.emit(HomeState.Error("not fund\nplease try again...")) }
+            in 500..599 -> { _state.emit(HomeState.Error("server error\nthe connect server is error please try again...")) }
         }
     }
 

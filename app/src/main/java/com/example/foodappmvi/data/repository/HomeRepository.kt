@@ -9,4 +9,5 @@ class HomeRepository @Inject constructor(private val apiServices: ApiServices) {
     suspend fun reqCategory() = apiServices.requestCategory()
     suspend fun reqFoodList(food: String) = apiServices.requestFoodList(str = food)
     suspend fun reqSearchFood(search: String) = apiServices.requestSearchFood(str = search)
+    suspend fun reqCategoryList(category: String) = apiServices.requestFilterByCategory(category)
 }

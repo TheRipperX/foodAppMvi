@@ -90,7 +90,11 @@ class HomeFragment : Fragment() {
                             categoryAdapter.setDataAdapter(data)
                             recCategoryList.isSetAction(categoryAdapter, LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false))
 
-                            categoryAdapter.clickItems {
+                            categoryAdapter.clickItems { items ->
+                                val name = items.strCategory
+                                lifecycleScope.launch {
+                                    homeViewModel.homeChannel.send(HomeIntent.SetCategoryList(name))
+                                }
 
                             }
                         }
