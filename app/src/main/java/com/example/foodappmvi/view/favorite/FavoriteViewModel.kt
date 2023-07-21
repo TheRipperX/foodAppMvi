@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,12 +32,12 @@ class FavoriteViewModel @Inject constructor(private val favRepository: FavReposi
     }
 
     private fun fetchingAllFoodShow() = viewModelScope.launch {
-        val data = favRepository.showAllFood()
-
-        _state.value = if (data.isEmpty()){
-            FavState.Empty
-        }else {
-            FavState.ShowAllFood(data)
+        favRepository.showAllFood().collect {
+            if (it.isEmpty()){
+                _state.emit(FavState.Empty)
+            }else {
+                _state.emit(FavState.ShowAllFood(it))
+            }
         }
     }
 

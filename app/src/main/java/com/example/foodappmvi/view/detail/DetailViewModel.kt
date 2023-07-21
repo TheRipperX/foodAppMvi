@@ -1,11 +1,14 @@
 package com.example.foodappmvi.view.detail
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.foodappmvi.data.db.FoodEntity
 import com.example.foodappmvi.data.repository.DetailRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,7 +28,24 @@ class DetailViewModel @Inject constructor(private val detailRepository: DetailRe
         detailChannel.consumeAsFlow().collect {
             when(it) {
                 is DetailIntent.SetDetailIntent -> { fetchDetailList(it.id) }
+                is DetailIntent.InsertFoodIntent -> { fetchingSave(it.foodEntity) }
+                is DetailIntent.DeleteFoodIntent -> { fetchingDelete(it.foodEntity) }
+                is DetailIntent.CheckFoodIntent -> { fetchingEx(it.id) }
             }
+        }
+    }
+
+    private fun fetchingSave(foodEntity: FoodEntity) = viewModelScope.launch {
+        _state.emit(DetailState.SaveFoodState(detailRepository.insertFood(foodEntity)))
+    }
+
+    private fun fetchingDelete(foodEntity: FoodEntity) = viewModelScope.launch{
+        _state.emit(DetailState.DeleteFoodState(detailRepository.deleteFood(foodEntity)))
+    }
+
+    private fun fetchingEx(id: Int) = viewModelScope.launch {
+        detailRepository.checkFood(id).collect {
+            _state.emit(DetailState.CheckFoodState(it))
         }
     }
 

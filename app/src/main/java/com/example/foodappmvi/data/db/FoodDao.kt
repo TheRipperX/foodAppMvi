@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.foodappmvi.utils.FOOD_TABLE
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FoodDao {
@@ -16,10 +17,10 @@ interface FoodDao {
     @Delete
     suspend fun deleteFood(foodEntity: FoodEntity)
 
-    @Query("SELECT * FROM $FOOD_TABLE")
-    fun allFoods(): MutableList<FoodEntity>
+    @Query("SELECT * FROM $FOOD_TABLE ORDER BY id DESC")
+    fun allFoods(): Flow<MutableList<FoodEntity>>
 
     @Query("SELECT EXISTS (SELECT 1 FROM $FOOD_TABLE WHERE id = :id)")
-    fun isFoodCheck(id: Int): Boolean
+    fun isFoodCheck(id: Int): Flow<Boolean>
 
 }
