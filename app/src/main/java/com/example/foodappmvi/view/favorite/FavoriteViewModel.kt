@@ -32,12 +32,16 @@ class FavoriteViewModel @Inject constructor(private val favRepository: FavReposi
     }
 
     private fun fetchingAllFoodShow() = viewModelScope.launch {
-        favRepository.showAllFood().collect {
-            if (it.isEmpty()){
-                _state.emit(FavState.Empty)
-            }else {
-                _state.emit(FavState.ShowAllFood(it))
+        try{
+            favRepository.showAllFood().collect {
+                if (it.isEmpty()){
+                    _state.emit(FavState.Empty)
+                }else {
+                    _state.emit(FavState.ShowAllFood(it))
+                }
             }
+        }catch (e: Exception) {
+            _state.emit(FavState.Empty)
         }
     }
 

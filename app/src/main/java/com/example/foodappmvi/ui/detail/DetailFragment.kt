@@ -17,9 +17,12 @@ import coil.load
 import com.example.foodappmvi.R
 import com.example.foodappmvi.data.db.FoodEntity
 import com.example.foodappmvi.databinding.FragmentDetailBinding
+import com.example.foodappmvi.utils.network.NetworkCheck
+import com.example.foodappmvi.utils.network.NetworkConnections
 import com.example.foodappmvi.view.detail.DetailIntent
 import com.example.foodappmvi.view.detail.DetailState
 import com.example.foodappmvi.view.detail.DetailViewModel
+import com.example.foodappmvi.view.home.HomeIntent
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,10 +41,21 @@ class DetailFragment : Fragment() {
 
     @Inject
     lateinit var detailViewModel: DetailViewModel
+
     @Inject
     lateinit var foodEntity: FoodEntity
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    //network check
+    @Inject
+    lateinit var network: NetworkConnections
+
+    private var foodListShow = false
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         binding = FragmentDetailBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -60,12 +74,10 @@ class DetailFragment : Fragment() {
             imgBack.setOnClickListener { findNavController().popBackStack() }
             //set data
             lifecycleScope.launch {
-                detailViewModel.detailChannel.send(DetailIntent.SetDetailIntent(foodId))
-                detailViewModel.detailChannel.send(DetailIntent.CheckFoodIntent(foodId))
 
                 //set data to view
-                detailViewModel.state.collect {state->
-                    when(state) {
+                detailViewModel.state.collect { state ->
+                    when (state) {
 
                         is DetailState.Idle -> {}
 
@@ -79,7 +91,7 @@ class DetailFragment : Fragment() {
                             foodEntity.foodImage = detail.strMealThumb
 
                             //set image
-                            imgFood.load(detail.strMealThumb){
+                            imgFood.load(detail.strMealThumb) {
                                 crossfade(true)
                                 crossfade(500)
                             }
@@ -88,17 +100,20 @@ class DetailFragment : Fragment() {
                             //set area
                             imgAreaFood.text = detail.strArea
                             //set page
-                            try{
-                                if (detail.strSource.toString().isNullOrEmpty()){
+                            try {
+                                if (detail.strSource.toString().isNullOrEmpty()) {
                                     imgPageFood.isVisible = false
-                                }else{
+                                } else {
                                     imgPageFood.isVisible = true
                                     imgPageFood.setOnClickListener {
-                                        val intentPage = Intent(Intent.ACTION_VIEW, Uri.parse(detail.strSource.toString()))
+                                        val intentPage = Intent(
+                                            Intent.ACTION_VIEW,
+                                            Uri.parse(detail.strSource.toString())
+                                        )
                                         startActivity(intentPage)
                                     }
                                 }
-                            }catch (e: Exception) {
+                            } catch (e: Exception) {
                                 imgPageFood.isVisible = false
                             }
                             //set title
@@ -109,7 +124,7 @@ class DetailFragment : Fragment() {
                             //set other
                             val json = JSONObject(Gson().toJson(detail))
 
-                            for(i in 1..15) {
+                            for (i in 1..15) {
 
                                 val strIngredient = json.getString("strIngredient$i")
                                 if (!strIngredient.isNullOrEmpty())
@@ -132,18 +147,31 @@ class DetailFragment : Fragment() {
                         }
 
                         is DetailState.SaveFoodState -> {
-                            Snackbar.make(binding.root, "Add Successfully", Snackbar.LENGTH_LONG).show()
+                            Snackbar.make(binding.root, "Add Successfully", Snackbar.LENGTH_LONG)
+                                .show()
                         }
+
                         is DetailState.DeleteFoodState -> {
-                            Snackbar.make(binding.root, "Remove Successfully", Snackbar.LENGTH_LONG).show()
+                            Snackbar.make(binding.root, "Remove Successfully", Snackbar.LENGTH_LONG)
+                                .show()
                         }
+
                         is DetailState.CheckFoodState -> {
                             isFav = state.exists
-                            if (state.exists){
-                                imgFavorite.setColorFilter(ContextCompat.getColor(requireContext(), R.color.red))
-                            }
-                            else {
-                                imgFavorite.setColorFilter(ContextCompat.getColor(requireContext(), R.color.black))
+                            if (state.exists) {
+                                imgFavorite.setColorFilter(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.red
+                                    )
+                                )
+                            } else {
+                                imgFavorite.setColorFilter(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.black
+                                    )
+                                )
                             }
 
                         }
@@ -161,7 +189,36 @@ class DetailFragment : Fragment() {
                 }
             }
 
+            //network check
+            lifecycleScope.launch {
+                network.observeNet().collect {
+                    when (it) {
+                        NetworkCheck.Status.Available -> {
+                            detailViewModel.detailChannel.send(DetailIntent.SetDetailIntent(foodId))
+                            detailViewModel.detailChannel.send(DetailIntent.CheckFoodIntent(foodId))
+                            foodListShow = true
+                        }
+
+                        NetworkCheck.Status.Unavailable -> {
+                            errorNetwork()
+                        }
+
+                        NetworkCheck.Status.Losing -> {
+                            errorNetwork()
+                        }
+
+                        NetworkCheck.Status.Lost -> {
+                            errorNetwork()
+                        }
+                    }
+                }
+            }
+
         }
     }
 
+    private fun errorNetwork() {
+        Snackbar.make(binding.root, "No internet connection available for your Android app!!", Snackbar.LENGTH_LONG).show()
+        foodListShow = false
+    }
 }

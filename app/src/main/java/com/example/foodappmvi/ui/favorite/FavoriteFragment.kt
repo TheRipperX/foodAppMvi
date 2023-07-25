@@ -14,9 +14,13 @@ import com.example.foodappmvi.databinding.FragmentFavoriteBinding
 import com.example.foodappmvi.ui.favorite.adapter.AdapterFav
 import com.example.foodappmvi.utils.isSetAction
 import com.example.foodappmvi.utils.isVisibleView
+import com.example.foodappmvi.utils.network.NetworkCheck
+import com.example.foodappmvi.utils.network.NetworkConnections
 import com.example.foodappmvi.view.favorite.FavIntent
 import com.example.foodappmvi.view.favorite.FavState
 import com.example.foodappmvi.view.favorite.FavoriteViewModel
+import com.example.foodappmvi.view.home.HomeIntent
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,6 +35,9 @@ class FavoriteFragment : Fragment() {
 
     @Inject
     lateinit var adapterFav: AdapterFav
+    @Inject
+    lateinit var network: NetworkConnections
+    private var foodListShow = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentFavoriteBinding.inflate(layoutInflater)
@@ -48,7 +55,6 @@ class FavoriteFragment : Fragment() {
         binding.apply {
 
             lifecycleScope.launch {
-                favoriteViewModel.favIntent.send(FavIntent.ShowAllFoodIntent)
 
                 favoriteViewModel.state.collect {state ->
                     when(state) {
@@ -72,8 +78,28 @@ class FavoriteFragment : Fragment() {
                 }
             }
 
+            //network check
+            lifecycleScope.launch {
+                network.observeNet().collect {
+                    when(it) {
+                        NetworkCheck.Status.Available -> {
+                            favoriteViewModel.favIntent.send(FavIntent.ShowAllFoodIntent)
+                            foodListShow = true
+                        }
+                        NetworkCheck.Status.Unavailable -> { errorNetwork() }
+                        NetworkCheck.Status.Losing -> { errorNetwork() }
+                        NetworkCheck.Status.Lost -> { errorNetwork() }
+                    }
+                }
+            }
+
         }
 
+    }
+
+    private fun errorNetwork() {
+        Snackbar.make(binding.root, "No internet connection available for your Android app!!", Snackbar.LENGTH_LONG).show()
+        foodListShow = false
     }
 
 }

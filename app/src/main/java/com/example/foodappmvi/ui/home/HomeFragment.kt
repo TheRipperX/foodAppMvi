@@ -16,12 +16,15 @@ import com.example.foodappmvi.ui.home.adapter.AdapterCategory
 import com.example.foodappmvi.ui.home.adapter.AdapterFoodList
 import com.example.foodappmvi.utils.isSetAction
 import com.example.foodappmvi.utils.isVisibleView
+import com.example.foodappmvi.utils.network.NetworkCheck
+import com.example.foodappmvi.utils.network.NetworkConnections
 import com.example.foodappmvi.utils.setItemSpinner
 import com.example.foodappmvi.view.home.HomeIntent
 import com.example.foodappmvi.view.home.HomeState
 import com.example.foodappmvi.view.home.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,6 +42,11 @@ class HomeFragment : Fragment() {
     lateinit var categoryAdapter: AdapterCategory
     @Inject
     lateinit var adapterFoodList: AdapterFoodList
+    //network check
+    @Inject
+    lateinit var network: NetworkConnections
+
+    private var foodListShow = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,17 +66,18 @@ class HomeFragment : Fragment() {
         binding.apply {
 
             lifecycleScope.launch {
-
                 homeViewModel.homeChannel.send(HomeIntent.SetSpinnerIntent)
+                /*homeViewModel.homeChannel.send(HomeIntent.SetSpinnerIntent)
                 homeViewModel.homeChannel.send(HomeIntent.SetRandomIntent)
-                homeViewModel.homeChannel.send(HomeIntent.SetCategoryIntent)
+                homeViewModel.homeChannel.send(HomeIntent.SetCategoryIntent)*/
 
                 homeViewModel.state.collect {
                     when(it) {
                         is HomeState.Idle -> {}
                         is HomeState.SetSpinnerState -> {
                             spinnerHome.setItemSpinner(it.list) {str->
-                                lifecycleScope.launch { homeViewModel.homeChannel.send(HomeIntent.SetFoodListIntent(str)) }
+                                if (foodListShow)
+                                    lifecycleScope.launch { homeViewModel.homeChannel.send(HomeIntent.SetFoodListIntent(str)) }
                             }
                         }
                         is HomeState.SetRandomState -> {
@@ -135,12 +144,35 @@ class HomeFragment : Fragment() {
 
             edtSearch.addTextChangedListener {
                 lifecycleScope.launch {
-                    homeViewModel.homeChannel.send(HomeIntent.SetSearchFoodIntent(it.toString()))
+                    if (foodListShow)
+                        homeViewModel.homeChannel.send(HomeIntent.SetSearchFoodIntent(it.toString()))
                 }
             }
 
+            //network check
+            lifecycleScope.launch {
+                network.observeNet().collect {
+                    when(it) {
+                        NetworkCheck.Status.Available -> {
+
+                            homeViewModel.homeChannel.send(HomeIntent.SetRandomIntent)
+                            homeViewModel.homeChannel.send(HomeIntent.SetCategoryIntent)
+                            homeViewModel.homeChannel.send(HomeIntent.SetFoodListIntent("A"))
+                            foodListShow = true
+                        }
+                        NetworkCheck.Status.Unavailable -> { errorNetwork() }
+                        NetworkCheck.Status.Losing -> { errorNetwork() }
+                        NetworkCheck.Status.Lost -> { errorNetwork() }
+                    }
+                }
+            }
 
         }
+    }
+
+    private fun errorNetwork() {
+        Snackbar.make(binding.root, "No internet connection available for your Android app!!", Snackbar.LENGTH_LONG).show()
+        foodListShow = false
     }
 
 }

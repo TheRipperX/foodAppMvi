@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodappmvi.data.db.FoodEntity
 import com.example.foodappmvi.data.repository.DetailRepository
+import com.example.foodappmvi.view.home.HomeState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,22 +51,26 @@ class DetailViewModel @Inject constructor(private val detailRepository: DetailRe
     }
 
     private fun fetchDetailList(id: Int) = viewModelScope.launch{
-        val request = detailRepository.reqDetail(id)
+        try{
+            val request = detailRepository.reqDetail(id)
 
-        _state.emit(DetailState.SetDetailLoading)
+            _state.emit(DetailState.SetDetailLoading)
 
-        when(request.code()) {
-            in 200..202 -> {
-                request.body()?.let {
-                    if (!it.meals.isNullOrEmpty()) {
-                        _state.emit(DetailState.SetDetails(it.meals.toMutableList()))
-                    }else {
-                        _state.emit(DetailState.Error("not fund\nplease try again..."))
+            when(request.code()) {
+                in 200..202 -> {
+                    request.body()?.let {
+                        if (!it.meals.isNullOrEmpty()) {
+                            _state.emit(DetailState.SetDetails(it.meals.toMutableList()))
+                        }else {
+                            _state.emit(DetailState.Error("not fund\nplease try again..."))
+                        }
                     }
                 }
+                in 400..499 -> { _state.emit(DetailState.Error("not fund\nplease try again...")) }
+                in 500..599 -> { _state.emit(DetailState.Error("server error\nthe connect server is error please try again...")) }
             }
-            in 400..499 -> { _state.emit(DetailState.Error("not fund\nplease try again...")) }
-            in 500..599 -> { _state.emit(DetailState.Error("server error\nthe connect server is error please try again...")) }
+        } catch (e: Exception) {
+            _state.emit(DetailState.Error("No internet connection available..."))
         }
     }
 }
